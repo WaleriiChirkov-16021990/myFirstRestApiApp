@@ -2,11 +2,12 @@ package org.chirkov.firstRestApp.controllers;
 
 import org.chirkov.firstRestApp.models.Person;
 import org.chirkov.firstRestApp.services.PeopleService;
+import org.chirkov.firstRestApp.util.PersonErrorResponse;
+import org.chirkov.firstRestApp.util.PersonNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +30,16 @@ public class PeopleController {
     @GetMapping("/{id}")
     public Person getPerson(@PathVariable("id") int id) {
         return peopleService.findOne(id);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<PersonErrorResponse> handeleException(PersonNotFoundException e) {
+        PersonErrorResponse response = new PersonErrorResponse(
+                "Person with this id wasn't found", System.currentTimeMillis()
+        );
+        // (В HTTP ответе тело ответа (response)) In the HTTP response,
+        // the response body (response) and status in header.
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND) ; //NOT_FOUND = 404 status
     }
 }

@@ -3,11 +3,11 @@ package org.chirkov.firstRestApp.services;
 import lombok.Getter;
 import org.chirkov.firstRestApp.models.Person;
 import org.chirkov.firstRestApp.repositories.PeopleRepository;
+import org.chirkov.firstRestApp.util.PersonNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +29,7 @@ public class PeopleService {
 
     public Person findOne(int id) {
         Optional<Person> foundPerson = peopleRepository.findById(id);
-        return foundPerson.orElse(null);
+        return foundPerson.orElseThrow(PersonNotFoundException::new);
 
     }
 
