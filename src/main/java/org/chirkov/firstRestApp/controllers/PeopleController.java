@@ -1,6 +1,7 @@
 package org.chirkov.firstRestApp.controllers;
 
 import com.sun.istack.NotNull;
+import org.chirkov.firstRestApp.dto.PersonDTO;
 import org.chirkov.firstRestApp.models.Person;
 import org.chirkov.firstRestApp.services.PeopleService;
 import org.chirkov.firstRestApp.util.PersonErrorResponse;
@@ -39,7 +40,7 @@ public class PeopleController {
     }
 
     @ExceptionHandler
-    private ResponseEntity<PersonErrorResponse> handeleException(PersonNotFoundException e) {
+    private ResponseEntity<PersonErrorResponse> handlerException(PersonNotFoundException e) {
         PersonErrorResponse response = new PersonErrorResponse(
                 "Person with this id wasn't found", System.currentTimeMillis()
         );
@@ -51,7 +52,7 @@ public class PeopleController {
 
 
     @PostMapping
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid Person person, @NotNull BindingResult bindingResult) {
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid PersonDTO person, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             AtomicReference<StringBuilder> errorMessage = new AtomicReference<>(new StringBuilder());
             List<FieldError> fieldErrorList = bindingResult.getFieldErrors();
@@ -64,12 +65,20 @@ public class PeopleController {
             }
             throw new PersonNotCreatedException(errorMessage.toString());
         }
-        peopleService.save(person);
+        peopleService.save(convertToPerson(person));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    private Person convertToPerson(PersonDTO personDTO) {
+        return new Person(
+                personDTO.getName(),
+                personDTO.getAge(),
+                personDTO.getEmail()
+        );
+    }
+
     @ExceptionHandler
-    private ResponseEntity<PersonErrorResponse> handeleException(PersonNotCreatedException e) {
+    private ResponseEntity<PersonErrorResponse> handlerException(PersonNotCreatedException e) {
         PersonErrorResponse response = new PersonErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis()

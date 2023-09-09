@@ -45,6 +45,7 @@ public class Person {
 
     @Column(name = "created_who")
     @NotNull
+    @NotEmpty
     private String created_who;
 
 
