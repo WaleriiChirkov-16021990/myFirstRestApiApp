@@ -7,6 +7,7 @@ import org.chirkov.firstRestApp.services.PeopleService;
 import org.chirkov.firstRestApp.util.PersonErrorResponse;
 import org.chirkov.firstRestApp.util.PersonNotCreatedException;
 import org.chirkov.firstRestApp.util.PersonNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,12 +71,18 @@ public class PeopleController {
     }
 
     private Person convertToPerson(PersonDTO personDTO) {
-        return new Person(
-                personDTO.getName(),
-                personDTO.getAge(),
-                personDTO.getEmail()
-        );
+        ModelMapper modelMapper = new ModelMapper(); //full mapping DTO on my model {manual object creation}
+        return modelMapper.map(personDTO, Person.class);
     }
+
+//
+//    private Person convertToPerson(PersonDTO personDTO) {
+//        return new Person(
+//                personDTO.getName(),
+//                personDTO.getAge(),
+//                personDTO.getEmail()
+//        );
+//    }
 
     @ExceptionHandler
     private ResponseEntity<PersonErrorResponse> handlerException(PersonNotCreatedException e) {
