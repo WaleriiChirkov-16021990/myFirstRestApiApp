@@ -1,6 +1,5 @@
 package org.chirkov.firstRestApp.controllers;
 
-import com.sun.istack.NotNull;
 import org.chirkov.firstRestApp.dto.PersonDTO;
 import org.chirkov.firstRestApp.models.Person;
 import org.chirkov.firstRestApp.services.PeopleService;
@@ -18,26 +17,29 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/people")
 public class PeopleController {
 
     private final PeopleService peopleService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public PeopleController(PeopleService peopleService) {
+    public PeopleController(PeopleService peopleService, ModelMapper modelMapper) {
         this.peopleService = peopleService;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping()
-    public List<Person> getPeople() {
-        return peopleService.findAll(); //Jackson convert to JSON List<Person>
+    public List<PersonDTO> getPeople() {
+        return peopleService.findAll().stream().map(this::convertToPersonDTO).collect(Collectors.toList()); //Jackson convert to JSON List<Person>
     }
 
     @GetMapping("/{id}")
-    public Person getPerson(@PathVariable("id") int id) {
-        return peopleService.findOne(id);
+    public PersonDTO getPerson(@PathVariable("id") int id) {
+        return convertToPersonDTO(peopleService.findOne(id));
     }
 
     @ExceptionHandler
@@ -71,7 +73,7 @@ public class PeopleController {
     }
 
     private Person convertToPerson(PersonDTO personDTO) {
-        ModelMapper modelMapper = new ModelMapper(); //full mapping DTO on my model {manual object creation}
+//        ModelMapper modelMapper = new ModelMapper(); //full mapping DTO on my model {manual object creation}
         return modelMapper.map(personDTO, Person.class);
     }
 
@@ -94,5 +96,9 @@ public class PeopleController {
         // the response body (response) and status in header.
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); //BAD_REQUEST = 400 status
+    }
+
+    private PersonDTO convertToPersonDTO(Person person) {
+        return modelMapper.map(person, PersonDTO.class);
     }
 }
