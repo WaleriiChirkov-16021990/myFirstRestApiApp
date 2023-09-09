@@ -7,7 +7,9 @@ import org.hibernate.validator.constraints.Range;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 
@@ -29,10 +31,21 @@ public class Person {
     @Range(min = 1, max = 333, message = "Age should be between 1 - 333 and ")
     @Column(name = "age")
     private int age;
+
     @NotEmpty(message = "Email should not be empty!")
     @Email(message = "Email should be valid")
     @Column(name = "email")
     private String email;
+
+    @Column(name = "create_at")
+    private LocalDateTime created_at;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updated_at;
+
+    @Column(name = "created_who")
+    @NotNull
+    private String created_who;
 
 
     public Person() {
